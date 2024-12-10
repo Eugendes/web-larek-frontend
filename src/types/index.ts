@@ -4,7 +4,7 @@ export interface Goods {
   category: string; //категория товара
   title: string; //название товара
   image: string; //картинка товара
-  price: number; //цена
+  price: number | null; //цена
 }
 
 export interface GoodSelect {
@@ -13,7 +13,7 @@ export interface GoodSelect {
   title: string; //название товара
   image: string; //картинка товара
   description: string; //описание товара
-  price: number; //цена
+  price: number | null; //цена
 }
 
 export interface Basket {
@@ -160,7 +160,7 @@ export interface Product {
   title: string;          // Название товара
   category: string;   // Категория товара
   description: string;   // Описание товара
-  price: number;         // Цена товара
+  price: number | null;         // Цена товара
   image: string;      // URL изображения товара
 }
 
@@ -183,7 +183,7 @@ export interface AppState {
 export interface OrderFormState {
   products: {
     title: string;       // Название товара
-    price: number;       // Цена товара
+    price: number  | null;       // Цена товара
   }
   paymentType: 'online' | 'onDelivery'; // Выбранный тип оплаты
   address: FormFieldState;   // Поле для адреса доставки
@@ -195,7 +195,7 @@ export interface OrderFormState {
 export interface BasketState {
   items: {
     title: string;       // Название товара
-    price: number;       // Цена товара
+    price: number | null;       // Цена товара
   }[];
   totalItems: number;        // Общее количество товаров
   totalPrice: number;        // Общая стоимость товаров
