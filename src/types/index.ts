@@ -22,7 +22,7 @@ export interface Basket {
 }
 
 export interface Payment {
-  basket: Basket; //выбранные товары(используется только массив price[]) 
+  productIds: string[]; // массив идентификаторов выбранных товаров
   payment: string; //тип оплаты
   address: string; //адрес доставки
   email: string; //почта получателя
