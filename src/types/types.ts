@@ -1,13 +1,39 @@
 
-export interface Goods {
+type CategoryType = 
+  | 'другое'
+  | 'софт-скил'
+  | 'дополнительное'
+  | 'кнопка'
+  | 'хард-скил';
+
+  // функиция для цветов блоков категория
+  export function mapCategoryToClass(category: CategoryType): string {
+    switch (category) {
+      case 'софт-скил':
+        return 'card__category_soft';
+      case 'другое':
+        return 'card__category_other';
+      case 'дополнительное':
+        return 'card__category_additional';
+      case 'кнопка':
+        return 'card__category_button';
+      case 'хард-скил':
+        return 'card__category_hard';
+      default:
+        return '';
+    }
+  }
+
+export interface IGoods {
   id: string; //id товара
-  category: string; //категория товара
+  category: CategoryType; //категория товара
   title: string; //название товара
   image: string; //картинка товара
   price: number | null; //цена
+  description: string; //описание товара
 }
 
-export interface GoodSelect {
+export interface IGoodSelect {
   id: string; //id товара
   category: string; //категория товара
   title: string; //название товара
@@ -16,13 +42,19 @@ export interface GoodSelect {
   price: number | null; //цена
 }
 
+export interface BasketItem {
+  id: string;
+  title: string;
+  price: number | null;
+}
+/*
 export interface Basket {
   basketGoods: Goods[]; //выбранные товары(массив данных)
   priceTotal: number; //общая цена товаров 
 }
 
 export interface Payment {
-  productIds: string[]; // массив идентификаторов выбранных товаров
+  basket: Basket; //выбранные товары(используется только массив price[]) 
   payment: string; //тип оплаты
   address: string; //адрес доставки
   email: string; //почта получателя
@@ -33,8 +65,9 @@ export interface PurchasingProcess {
   basketGoods: Goods[]; //доступные товары(массив данных)
   basket: Basket; //выбранные товары
 }
-
+*/
 /*........................................СОБЫТИЯ, ПРОИСХОДЯЩИЕ НА СТРАНИЦЕ..............................................*/
+/*
 export enum Events {
   // События объекта товары
   PRODUCT_SELECTED = 'product:selected',         // Товар выбран для просмотра
@@ -56,8 +89,9 @@ export enum Events {
   ORDER_SUCCESS = 'order:success',                 // Заказ успешно оформлен
   ORDER_FAILED = 'order:failed',                   // Ошибка при оформлении заказа
 }
-
+*/
 /*..............................................ИНТЕРФЕЙСЫ ДЛЯ СОБЫТИЙ...................................................*/
+/*
 // Интерфейс для события выбора товара для просмотра
 export interface ProductSelectedEvent {
   type: Events.PRODUCT_SELECTED;
@@ -152,8 +186,9 @@ export interface OrderFailedEvent {
     errorMessage: string; // Сообщение об ошибке
   };
 }
-
+*/
 /*..................................................ДРУГИЕ ИНТЕРФЕЙСЫ...................................................*/
+/*
 // Интерфейс для товара
 export interface Product {
   id: string;            // Уникальный идентификатор товара
@@ -212,3 +247,4 @@ export interface BaseComponent {
   render(): void;            // Метод рендеринга компонента
   attachEventListeners(): void; // Метод для привязки обработчиков событий
 }
+*/
