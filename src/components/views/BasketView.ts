@@ -16,12 +16,10 @@ export class BasketView {
     }
 
     basketList.innerHTML = ''; // Очистка списка перед рендером
-
     const items = this.controller.getItems();
-    
-    console.log(items);
-    
+
     if (items.length === 0) {
+      const counter = document.querySelector('.header__basket-counter').textContent = '0';
       const emptyMessage = document.createElement('span');
       emptyMessage.classList.add('card__title');
       emptyMessage.textContent = 'Корзина пуста';
@@ -54,7 +52,6 @@ export class BasketView {
       const deleteButton = itemContent.querySelector('.basket__item-delete') as HTMLButtonElement;
       if (deleteButton) {
         deleteButton.addEventListener('click', () => {
-            console.log(`Удаление товара с ID: ${item.id}`);
             this.updateBasketCounter();
             this.controller.removeItem(item.id);
             this.renderBasket(); // Обновляем корзину после удаления

@@ -286,11 +286,7 @@ export class ModalManager {
   private async submitOrder(): Promise<void> {
     try {
 			const formattedData = this.formatOrderData(this.orderData);
-			console.log('Отправляем данные на сервер:', formattedData);
-	
 			const response = await api.post<Payment>("/order", formattedData);
-			console.log('Ответ сервера:', response);
-	
 			this.openSuccessModal();
 		} catch (error) {
 			console.error('Ошибка при отправке заказа:', error);

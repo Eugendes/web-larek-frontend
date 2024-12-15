@@ -52,9 +52,8 @@ function openBasket(): void {
           if (itemElement) {
             const itemId = itemElement.getAttribute('id');
             if (itemId) {
-              console.log(`Удаление товара с id: ${itemId}`);
-              removeFromBasket(itemId); // Удаляем из корзины
-              basketView.renderBasket(); // Перерендериваем корзину после обновления данных
+              removeFromBasket(itemId);
+              basketView.renderBasket();
             } else {
               console.error('ID не найден на элементе item-index');
             }
