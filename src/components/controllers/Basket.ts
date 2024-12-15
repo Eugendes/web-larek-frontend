@@ -2,7 +2,7 @@ import { BasketController } from './BasketController';
 import { BasketView } from '../views/BasketView';
 import { BasketItems } from '../../types/types';
 
-const controller = new BasketController();
+const controller = BasketController.getInstance();
 const view = new BasketView(controller);
 
 // Добавить товар в корзину

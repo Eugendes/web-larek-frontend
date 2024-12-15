@@ -51,6 +51,15 @@ export class BasketView {
           priceElem.textContent = 'Бесценно';
         }
       }
+      const deleteButton = itemContent.querySelector('.basket__item-delete') as HTMLButtonElement;
+      if (deleteButton) {
+        deleteButton.addEventListener('click', () => {
+            console.log(`Удаление товара с ID: ${item.id}`);
+            this.updateBasketCounter();
+            this.controller.removeItem(item.id);
+            this.renderBasket(); // Обновляем корзину после удаления
+        });
+    }
       basketList.appendChild(itemContent);
     });
 

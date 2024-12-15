@@ -9,7 +9,7 @@ import { BasketController } from './components/controllers/BasketController';
 
 const goodsController = new GoodsController();
 
-const basketController = new BasketController();
+const basketController = BasketController.getInstance();
 const basketView = new BasketView(basketController);
 
 // Загружаем продукты после загрузки DOM

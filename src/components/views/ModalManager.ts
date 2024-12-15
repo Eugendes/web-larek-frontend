@@ -6,7 +6,7 @@ import { BasketController } from '../controllers/BasketController';
 import { getBasketItems } from '../controllers/Basket';
 import { listPreparatory } from '../getElements';
 
-const basketController = new BasketController();
+const basketController = BasketController.getInstance();
 const basketView = new BasketView(basketController);
 const api = new Api(`${process.env.API_ORIGIN}/api/weblarek`);
 
@@ -334,12 +334,10 @@ export class ModalManager {
   }
 
   private clearBasket(): void {
-    const basketCounter = getBasketItems();
-    if (basketCounter.length === 0) return;
-    basketCounter.length = 0;
+    basketController.clearBasket();
     basketView.renderBasket();
     basketView.updateBasketCounter();
-  }
+}
 
   private togglePaymentButton(
     buttons: NodeListOf<HTMLButtonElement>,
