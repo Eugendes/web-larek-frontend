@@ -47,19 +47,28 @@ export interface BasketItem {
   title: string;
   price: number | null;
 }
+
+export interface Payment {
+  total: number; // Сумма заказа
+  payment: string;    // Выбранный тип оплаты
+  address: string;    // Адрес доставки
+  email: string;      // Почта получателя
+  phone: string;      // Номер телефона получателя
+  items: { id: string }[]; // Массив выбранных товаров
+}
+
+export interface OrderResponse {
+  id: string;
+  total: number;
+}
+
 /*
 export interface Basket {
   basketGoods: Goods[]; //выбранные товары(массив данных)
   priceTotal: number; //общая цена товаров 
 }
 
-export interface Payment {
-  basket: Basket; //выбранные товары(используется только массив price[]) 
-  payment: string; //тип оплаты
-  address: string; //адрес доставки
-  email: string; //почта получателя
-  phone: string; //номер получателя
-}
+
 
 export interface PurchasingProcess {
   basketGoods: Goods[]; //доступные товары(массив данных)
