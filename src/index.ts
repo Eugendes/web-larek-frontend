@@ -1,10 +1,16 @@
 import './scss/styles.scss';
 import { GoodsController } from './components/controllers/GoodsController';
-import { getBasketItems } from './components/controllers/Basket';
+import { getBasketItems, removeFromBasket } from './components/controllers/Basket';
 import { ModalManager } from './components/views/ModalManager';
 import { listPreparatory } from './components/getElements';
 
+import { BasketView } from './components/views/BasketView';
+import { BasketController } from './components/controllers/BasketController';
+
 const goodsController = new GoodsController();
+
+const basketController = new BasketController();
+const basketView = new BasketView(basketController);
 
 // Загружаем продукты после загрузки DOM
 window.addEventListener('DOMContentLoaded', () => {
@@ -33,6 +39,34 @@ function openBasket(): void {
   // Указываем содержимое для отображения в модальном окне
   const modalManager = new ModalManager(document.getElementById('modal-container') as HTMLElement);
   modalManager.openModal(items); // Передаем текущие товары
+
+  
+  const butDel = modalContentContainer.querySelectorAll('.basket__item-delete');
+  if (butDel) {
+    butDel.forEach((deleteButton) => {
+      deleteButton.addEventListener('click', () => {
+        // Находим родительский элемент кнопки, чтобы получить соответствующий item-index
+        const basketItem = deleteButton.closest('.basket__item') as HTMLElement;
+        if (basketItem) {
+          const itemElement = basketItem.querySelector('.basket__item-index') as HTMLElement;
+          if (itemElement) {
+            const itemId = itemElement.getAttribute('id');
+            if (itemId) {
+              console.log(`Удаление товара с id: ${itemId}`);
+              removeFromBasket(itemId); // Удаляем из корзины
+              basketView.renderBasket(); // Перерендериваем корзину после обновления данных
+            } else {
+              console.error('ID не найден на элементе item-index');
+            }
+          } else {
+            console.error('Элемент item-index не найден внутри basket__item');
+          }
+        } else {
+          console.error('Родительский элемент basket__item не найден');
+        }
+      });
+    });
+  }
 }
 
 // Навешиваем обработчик на кнопку корзины

@@ -4,6 +4,8 @@ export class BasketController {
   private basketItems: BasketItems[] = [];
 
   getItems(): BasketItems[] {
+    console.log(this.basketItems);
+    
     return this.basketItems;
   }
 

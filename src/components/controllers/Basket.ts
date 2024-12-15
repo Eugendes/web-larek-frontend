@@ -16,7 +16,7 @@ export function addToBasket(item: BasketItems): void {
 export function removeFromBasket(id: string): void {
   controller.removeItem(id);
   view.updateBasketCounter();
-  view.renderBasket();
+  //view.renderBasket();
 }
 
 // Получить список товаров

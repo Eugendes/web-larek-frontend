@@ -18,6 +18,9 @@ export class BasketView {
     basketList.innerHTML = ''; // Очистка списка перед рендером
 
     const items = this.controller.getItems();
+    
+    console.log(items);
+    
     if (items.length === 0) {
       const emptyMessage = document.createElement('span');
       emptyMessage.classList.add('card__title');
@@ -37,7 +40,6 @@ export class BasketView {
       const indexElem = itemContent.querySelector('.basket__item-index') as HTMLElement;
       const titleElem = itemContent.querySelector('.card__title') as HTMLElement;
       const priceElem = itemContent.querySelector('.card__price') as HTMLElement;
-      const deleteButton = itemContent.querySelector('.basket__item-delete') as HTMLButtonElement;
 
       if (indexElem) indexElem.textContent = (index + 1).toString();
       if (titleElem) titleElem.textContent = item.title;
@@ -49,14 +51,6 @@ export class BasketView {
           priceElem.textContent = 'Бесценно';
         }
       }
-
-      if (deleteButton) {
-        deleteButton.addEventListener('click', () => {
-          this.controller.removeItem(item.id); // Удаление товара из контроллера
-          this.renderBasket(); // Перерендер корзины
-        });
-      }
-
       basketList.appendChild(itemContent);
     });
 
