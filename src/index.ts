@@ -1,22 +1,15 @@
 import './scss/styles.scss';
-import { goodsService } from './components/cardGoods';
-import { IGoods } from './types/types';
-import { getBasketItems } from './components/Basket';
-import { ModalManager } from './components/ModalManager';
+import { GoodsController } from './components/controllers/GoodsController';
+import { getBasketItems } from './components/controllers/Basket';
+import { ModalManager } from './components/views/ModalManager';
 import { listPreparatory } from './components/getElements';
 
+const goodsController = new GoodsController();
 
 // Загружаем продукты после загрузки DOM
-window.addEventListener('DOMContentLoaded', loadProducts);
-
-async function loadProducts() {
-  try {
-    const products: IGoods[] = await goodsService.fetchProducts();
-    goodsService.renderProducts(products);
-  } catch (error) {
-    console.error('Ошибка при загрузке товаров:', error);
-  }
-}
+window.addEventListener('DOMContentLoaded', () => {
+  goodsController.loadAndRenderProducts();
+});
 
 // Функция для открытия корзины
 function openBasket(): void {
@@ -39,7 +32,7 @@ function openBasket(): void {
   const items = getBasketItems();
   // Указываем содержимое для отображения в модальном окне
   const modalManager = new ModalManager(document.getElementById('modal-container') as HTMLElement);
-  modalManager.openModal(getBasketItems());
+  modalManager.openModal(items); // Передаем текущие товары
 }
 
 // Навешиваем обработчик на кнопку корзины
@@ -47,3 +40,4 @@ const basketButton = document.querySelector('.header__basket') as HTMLElement;
 if (basketButton) {
   basketButton.addEventListener('click', openBasket);
 }
+

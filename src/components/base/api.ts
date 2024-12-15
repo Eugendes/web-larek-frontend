@@ -1,7 +1,4 @@
-export type ApiListResponse<Type> = {
-    total: number;
-    items: Type[];
-};
+import { ApiListResponses } from '../../types/types';
 
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
@@ -28,11 +25,11 @@ export class Api {
         }
     }
 
-    get<Type>(uri: string): Promise<ApiListResponse<Type>> {
+    get<Type>(uri: string): Promise<ApiListResponses<Type>> {
         return fetch(this.baseUrl + uri, {
             ...this.options,
             method: 'GET',
-        }).then(response => this.handleResponse<ApiListResponse<Type>>(response));
+        }).then(response => this.handleResponse<ApiListResponses<Type>>(response));
     }
 
     post<Type>(uri: string, data: object, method: ApiPostMethods = 'POST'): Promise<Type> {
