@@ -15,16 +15,17 @@ export class BasketView {
       return;
     }
 
-    basketList.innerHTML = ''; // Очистка списка перед рендером
+    basketList.innerHTML = '';
     const items = this.controller.getItems();
 
     if (items.length === 0) {
-      const counter = document.querySelector('.header__basket-counter').textContent = '0';
-      const emptyMessage = document.createElement('span');
+            const emptyMessage = document.createElement('span');
       emptyMessage.classList.add('card__title');
       emptyMessage.textContent = 'Корзина пуста';
       basketList.appendChild(emptyMessage);
       basketPriceElem.textContent = '0 синапсов';
+      
+      this.updateBasketCounter();
       return;
     }
 
@@ -49,18 +50,19 @@ export class BasketView {
           priceElem.textContent = 'Бесценно';
         }
       }
+
       const deleteButton = itemContent.querySelector('.basket__item-delete') as HTMLButtonElement;
       if (deleteButton) {
         deleteButton.addEventListener('click', () => {
-            this.updateBasketCounter();
-            this.controller.removeItem(item.id);
-            this.renderBasket(); // Обновляем корзину после удаления
+                        this.controller.removeItem(item.id);
+            this.renderBasket();
         });
     }
       basketList.appendChild(itemContent);
     });
 
     basketPriceElem.textContent = `${totalPrice.toLocaleString('ru-RU')} синапсов`;
+    this.updateBasketCounter();
   }
 
   updateBasketCounter(): void {
@@ -69,6 +71,7 @@ export class BasketView {
       console.error('Счетчик корзины не найден');
       return;
     }
+    //console.log('Обновление счетчика, текущее количество:', this.controller.getItemCount());
     basketCounter.textContent = this.controller.getItemCount().toString();
   }
 }
