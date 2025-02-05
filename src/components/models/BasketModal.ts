@@ -1,17 +1,14 @@
-import { ModalManager } from './ModalManager';
-import { BasketController } from '../controllers/BasketController';
+import { ModalManager } from '../views/ModalManager';
 import { BasketView } from '../views/BasketView';
 
 export class BasketModal {
   private modalManager: ModalManager;
   private basketTemplate: HTMLTemplateElement;
-  private basketController: BasketController;
   private basketView: BasketView;
 
-  constructor(modalContainer: HTMLElement, basketController: BasketController) {
-    this.modalManager = new ModalManager(modalContainer);
-    this.basketController = basketController;
-    this.basketView = new BasketView(this.basketController);
+  constructor(modalManager: ModalManager, basketView: BasketView) {
+    this.modalManager = modalManager;
+    this.basketView = basketView;
 
     const template = document.getElementById('basket') as HTMLTemplateElement;
     if (!template) {
@@ -22,14 +19,13 @@ export class BasketModal {
 
   // Метод для открытия корзины
   openBasket(): void {
-   
     // Подготавливаем контент модального окна
     const modalContent = this.basketTemplate.content.cloneNode(true) as HTMLElement;
 
-    // Вставляем содержимое корзины в модальное окно
-    const modalContainer = document.querySelector('.modal__content') as HTMLElement;
+    // Получаем контейнер модального окна через ModalManager
+    const modalContainer = this.modalManager.getModalContainer();
     if (!modalContainer) {
-      console.error('BasketModal: .modal__content не найдено');
+      console.error('BasketModal: modalContainer не найдено');
       return;
     }
 
@@ -40,8 +36,6 @@ export class BasketModal {
     this.basketView.renderBasket();
 
     // Открываем модальное окно через ModalManager
-    this.modalManager.openModal(modalContainer);
-    
+    this.modalManager.openModal();
   }
 }
-

@@ -1,4 +1,4 @@
-import { GoodsService } from '../base/GoodsService';
+import { GoodsService } from '../models/GoodsModal';
 import { GoodsView } from '../views/GoodsView';
 import { API_URL } from '../../utils/constants';
 import { IGoods } from '../../types/types';
@@ -10,7 +10,8 @@ export class GoodsController {
   constructor() {
     // Инициализация сервиса и представления
     this.goodsService = new GoodsService(API_URL);
-    this.goodsView = new GoodsView(this); // Передаем `GoodsController` в `GoodsView`
+    this.goodsView = new GoodsView();
+    this.goodsView.addCardClickListener(this.getProductById.bind(this));
   }
 
   // Загружаем и отображаем товары

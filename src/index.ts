@@ -2,8 +2,7 @@ import './scss/styles.scss';
 import { GoodsController } from './components/controllers/GoodsController';
 import { getBasketItems, removeFromBasket } from './components/controllers/Basket';
 import { ModalManager } from './components/views/ModalManager';
-import { listPreparatory } from './components/getElements';
-
+import { listPreparatory } from './utils/getElements';
 import { BasketView } from './components/views/BasketView';
 import { BasketController } from './components/controllers/BasketController';
 

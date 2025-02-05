@@ -1,10 +1,8 @@
-import { Api } from '../base/api';
+import { Api } from '../models/api';
 import { BasketItems, Payment } from '../../types/types';
 import { BasketView } from '../views/BasketView';
 import { BasketController } from '../controllers/BasketController';
-
-import { getBasketItems } from '../controllers/Basket';
-import { listPreparatory } from '../getElements';
+import { listPreparatory } from '../../utils/getElements';
 
 const basketController = BasketController.getInstance();
 const basketView = new BasketView(basketController);
@@ -27,10 +25,12 @@ export class ModalManager {
     this.addEventListeners();
   }
 
-  openModal(content: HTMLElement | BasketItems[]): void {
-    const modalContentContainer = this.modalContainer.querySelector(
-      '.modal__content'
-    ) as HTMLElement;
+  getModalContainer(): HTMLElement {
+    return this.modalContainer;
+  }
+
+  openModal(content?: HTMLElement | BasketItems[]): void {
+    const modalContentContainer = this.modalContainer.querySelector('.modal__content') as HTMLElement;
 
     if (!modalContentContainer) {
       console.error('Не найден элемент .modal__content внутри modal-container');
@@ -39,15 +39,15 @@ export class ModalManager {
 
     modalContentContainer.innerHTML = '';
 
-    if (Array.isArray(content)) {
-      this.renderBasketModal(content, modalContentContainer);
-    } else {
-      modalContentContainer.appendChild(content);
+    if (content) {
+      if (Array.isArray(content)) {
+        this.renderBasketModal(content, modalContentContainer);
+      } else {
+        modalContentContainer.appendChild(content);
+      }
     }
 
     this.modalContainer.classList.add('modal_active');
-
-		
   }
 
   closeModal(): void {
@@ -78,62 +78,76 @@ export class ModalManager {
     });
   }
 
-  renderBasketModal(
-    content: BasketItems[],
-    modalContentContainer: HTMLElement
-  ): void {
+  renderBasketModal(content: BasketItems[], modalContentContainer: HTMLElement): void {
+    // Очищаем modalContentContainer перед обновлением
+    modalContentContainer.innerHTML = "";
+
     const basketContainer = listPreparatory();
-    const basketList = basketContainer.querySelector(
-      '.basket__list'
-    ) as HTMLElement;
-    const template = document.getElementById(
-      'card-basket'
-    ) as HTMLTemplateElement;
+    const basketList = basketContainer.querySelector('.basket__list') as HTMLElement;
+    const template = document.getElementById('card-basket') as HTMLTemplateElement;
+    let checkoutButton = basketContainer.querySelector('.modal__actions .button') as HTMLButtonElement;
 
     if (!template) {
-      console.error('Не найден шаблон card-basket');
-      return;
+        console.error('Не найден шаблон card-basket');
+        return;
     }
 
+    // Проверяем, пуста ли корзина
     if (content.length === 0) {
-      const emptyMessage = document.createElement('span');
-      emptyMessage.classList.add('card__title');
-      emptyMessage.textContent = 'Корзина пуста';
-      basketList.appendChild(emptyMessage);
-    } else {
-      let totalPrice = 0;
-
-      content.forEach((item, index) => {
-        const itemContent = template.content.cloneNode(true) as HTMLElement;
-        this.fillBasketItem(itemContent, item, index);
-        basketList.appendChild(itemContent);
-        if (item.price) {
-          totalPrice += item.price;
+        const emptyMessage = document.createElement('span');
+        emptyMessage.classList.add('card__title');
+        emptyMessage.textContent = 'Корзина пуста';
+        basketList.appendChild(emptyMessage);
+        if (checkoutButton) {
+            checkoutButton.disabled = true;
         }
-      });
+    } else {
+        let totalPrice = 0;
 
-      const basketPriceElem = basketContainer.querySelector(
-        '.basket__price'
-      ) as HTMLElement;
+        content.forEach((item, index) => {
+            const itemContent = template.content.cloneNode(true) as HTMLElement;
+            this.fillBasketItem(itemContent, item, index);
 
-      if (basketPriceElem) {
-        basketPriceElem.textContent = `${totalPrice.toLocaleString(
-          'ru-RU'
-        )} синапсов`;
-      }
+            const deleteButton = itemContent.querySelector('.basket__item-delete') as HTMLButtonElement;
+            if (deleteButton) {
+                deleteButton.addEventListener('click', () => {
+                    basketController.removeItem(item.id); 
+
+                    setTimeout(() => {
+                        const updatedContent = basketController.getItems().filter(item => item !== undefined); 
+                        this.renderBasketModal(updatedContent, modalContentContainer); 
+                    }, 0);
+                });
+            }
+
+            basketList.appendChild(itemContent);
+            if (item.price) {
+                totalPrice += item.price;
+            }
+        });
+
+        const basketPriceElem = basketContainer.querySelector('.basket__price') as HTMLElement;
+        if (basketPriceElem) {
+            basketPriceElem.textContent = `${totalPrice.toLocaleString('ru-RU')} синапсов`;
+        }
+    }
+
+    checkoutButton = basketContainer.querySelector('.modal__actions .button') as HTMLButtonElement;
+
+    if (checkoutButton) {
+        setTimeout(() => {
+            const updatedItems = basketController.getItems().filter(item => item !== undefined);
+            checkoutButton.disabled = updatedItems.length === 0;
+
+            const newCheckoutButton = checkoutButton.cloneNode(true) as HTMLButtonElement;
+            checkoutButton.replaceWith(newCheckoutButton);
+            newCheckoutButton.addEventListener('click', () => {
+                this.handleCheckout(updatedItems);
+            });
+        }, 0);
     }
 
     modalContentContainer.appendChild(basketContainer);
-
-    const checkoutButton = modalContentContainer.querySelector(
-      '.modal__actions .button'
-    ) as HTMLButtonElement;
-
-    if (checkoutButton) {
-      checkoutButton.addEventListener('click', () => {
-        this.handleCheckout(content);
-      });
-    }
   }
 
   private fillBasketItem(
@@ -169,8 +183,12 @@ export class ModalManager {
     const itemIds = content.map((item) => item.id);
     this.orderData.total = totalPrice;
     this.orderData.items = itemIds.map((id) => ({ id }));
-
-    this.openOrderModal();
+    if (content.length === 0) {
+      return;
+    } else {
+      //console.log('✅ Выбранные товары:', content);
+      this.openOrderModal();
+    }
   }
 
   private openOrderModal(): void {

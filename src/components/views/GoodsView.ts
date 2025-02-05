@@ -1,17 +1,14 @@
 import { IGoods, mapCategoryToClass } from '../../types/types';
-import { getCardElements } from '../getElements';
+import { getCardElements } from '../../utils/getElements';
 import { CDN_URL } from '../../utils/constants';
 import { ModalManager } from './ModalManager';
-import { GoodsController } from '../controllers/GoodsController';
-import { addToBasket } from '../controllers/Basket';
+import { addToBasket, getBasketItems } from '../controllers/Basket';
 
 export class GoodsView {
   private gallery: HTMLElement | null;
-  private goodsController: GoodsController;
 
-  constructor(goodsController: GoodsController) {
+  constructor() {
     this.gallery = document.querySelector('main.gallery');
-    this.goodsController = goodsController;
   }
 
   renderProducts(products: IGoods[]): void {
@@ -54,23 +51,40 @@ export class GoodsView {
 
       this.gallery.appendChild(card);
     });
+  }
 
-    this.addCardClickListener();
+  addCardClickListener(getProductById: (id: string) => Promise<IGoods | null>): void {
+    if (!this.gallery) return;
+
+    this.gallery.addEventListener('click', async (event) => {
+      const target = event.target as HTMLElement;
+      const card = target.closest('.card') as HTMLElement;
+
+      if (card) {
+        const productId = card.getAttribute('data-product-id');
+
+        if (productId) {
+          const productDetails = await getProductById(productId);
+          if (productDetails) {
+            await this.openProductPreview(productDetails);
+          }
+        }
+      }
+    });
   }
 
   private async openProductPreview(productDetails: IGoods): Promise<void> {
     const template = document.getElementById('card-preview') as HTMLTemplateElement;
-  
+
     if (!template) {
       console.error('Шаблон card-preview не найден');
       return;
     }
-  
+
     const modalContent = template.content.cloneNode(true) as HTMLElement;
-  
     const { categoryElement, titleElement, textElement, imageElement, priceElement } =
       getCardElements(modalContent);
-  
+
     if (categoryElement) {
       categoryElement.textContent = productDetails.category;
       categoryElement.classList.add(mapCategoryToClass(productDetails.category));
@@ -89,14 +103,14 @@ export class GoodsView {
       const formattedPrice = productDetails.price?.toLocaleString('ru-RU') ?? null;
       priceElement.textContent = formattedPrice ? `${formattedPrice} синапсов` : 'Бесценно';
     }
-  
+
     const addToCartButton = modalContent.querySelector('.card__button') as HTMLButtonElement;
-  
+
     if (!addToCartButton) {
       console.error('Кнопка "Добавить в корзину" не найдена в модальном окне:', modalContent.innerHTML);
       return;
     }
-  
+
     addToCartButton.addEventListener('click', () => {
       addToBasket({
         id: productDetails.id,
@@ -105,28 +119,8 @@ export class GoodsView {
       });
       modalManager.closeModal();
     });
-  
+
     const modalManager = new ModalManager(document.getElementById('modal-container') as HTMLElement);
     modalManager.openModal(modalContent);
-  }
-
-  private addCardClickListener(): void {
-    if (!this.gallery) return;
-
-    this.gallery.addEventListener('click', async (event) => {
-      const target = event.target as HTMLElement;
-      const card = target.closest('.card') as HTMLElement;
-
-      if (card) {
-        const productId = card.getAttribute('data-product-id');
-
-        if (productId) {
-          const productDetails = await this.goodsController.getProductById(productId);
-          if (productDetails) {
-            await this.openProductPreview(productDetails);
-          }
-        }
-      }
-    });
   }
 }

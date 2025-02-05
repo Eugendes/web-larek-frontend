@@ -2,9 +2,23 @@ import { BasketController } from '../controllers/BasketController';
 
 export class BasketView {
   private controller: BasketController;
+  private basketCounter: HTMLElement | null;
 
   constructor(controller: BasketController) {
     this.controller = controller;
+    this.basketCounter = document.querySelector('.header__basket-counter');
+
+    // Навешиваем обработчик удаления на весь документ (event delegation)
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains('basket__item-delete')) {
+        const itemId = target.getAttribute('data-id');
+        if (itemId) {
+          this.controller.removeItem(itemId);
+          this.renderBasket();
+        }
+      }
+    });
   }
 
   renderBasket(): void {
@@ -19,59 +33,61 @@ export class BasketView {
     const items = this.controller.getItems();
 
     if (items.length === 0) {
-            const emptyMessage = document.createElement('span');
+      const emptyMessage = document.createElement('span');
       emptyMessage.classList.add('card__title');
       emptyMessage.textContent = 'Корзина пуста';
       basketList.appendChild(emptyMessage);
       basketPriceElem.textContent = '0 синапсов';
-      
       this.updateBasketCounter();
       return;
     }
 
     const template = document.getElementById('card-basket') as HTMLTemplateElement;
+    if (!template) {
+      console.error('BasketView: Шаблон card-basket не найден');
+      return;
+    }
+
     let totalPrice = 0;
+    const fragment = document.createDocumentFragment();
 
     items.forEach((item, index) => {
-      if (!template) return;
-
       const itemContent = template.content.cloneNode(true) as HTMLElement;
       const indexElem = itemContent.querySelector('.basket__item-index') as HTMLElement;
       const titleElem = itemContent.querySelector('.card__title') as HTMLElement;
       const priceElem = itemContent.querySelector('.card__price') as HTMLElement;
+      const deleteButton = itemContent.querySelector('.basket__item-delete') as HTMLButtonElement;
 
       if (indexElem) indexElem.textContent = (index + 1).toString();
       if (titleElem) titleElem.textContent = item.title;
       if (priceElem) {
-        if (item.price && item.price > 0) {
-          priceElem.textContent = `${item.price.toLocaleString('ru-RU')} синапсов`;
-          totalPrice += item.price;
-        } else {
-          priceElem.textContent = 'Бесценно';
-        }
+        priceElem.textContent = item.price && item.price > 0
+          ? `${item.price.toLocaleString('ru-RU')} синапсов`
+          : 'Бесценно';
+        totalPrice += item.price ?? 0;
       }
 
-      const deleteButton = itemContent.querySelector('.basket__item-delete') as HTMLButtonElement;
       if (deleteButton) {
-        deleteButton.addEventListener('click', () => {
-                        this.controller.removeItem(item.id);
-            this.renderBasket();
-        });
-    }
-      basketList.appendChild(itemContent);
+        deleteButton.setAttribute('data-id', item.id);
+      }
+
+      fragment.appendChild(itemContent);
     });
 
+    basketList.appendChild(fragment);
     basketPriceElem.textContent = `${totalPrice.toLocaleString('ru-RU')} синапсов`;
+
     this.updateBasketCounter();
   }
 
   updateBasketCounter(): void {
-    const basketCounter = document.querySelector('.header__basket-counter') as HTMLElement;
-    if (!basketCounter) {
-      console.error('Счетчик корзины не найден');
+    if (!this.basketCounter) {
+      this.basketCounter = document.querySelector('.header__basket-counter');
+    }
+    if (!this.basketCounter) {
+      console.error('BasketView: Счетчик корзины не найден');
       return;
     }
-    //console.log('Обновление счетчика, текущее количество:', this.controller.getItemCount());
-    basketCounter.textContent = this.controller.getItemCount().toString();
+    this.basketCounter.textContent = this.controller.getItemCount().toString();
   }
 }
